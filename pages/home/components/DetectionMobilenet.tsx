@@ -1,7 +1,6 @@
-import { CameraType } from 'expo-camera';
-import React, { useState, FC, useCallback, useEffect, useMemo } from 'react';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import React, { useState, FC, useCallback, useEffect, useMemo } from 'react';
 
 import * as tf from '@tensorflow/tfjs';
 import * as mobilenet from '@tensorflow-models/mobilenet';
@@ -12,18 +11,17 @@ import { CAM_PREVIEW_HEIGHT, CAM_PREVIEW_WIDTH, checkIsPortrait } from '../../..
 
 let frame = 0;
 
-interface DetectionProps {
-  net: mobilenet.MobileNet | undefined;
-}
+interface DetectionProps {}
 
-const Detection: FC<DetectionProps> = (props) => {
-  const { net } = props;
+const DetectionMobilenet: FC<DetectionProps> = (props) => {
+  const [net, setNet] = useState<mobilenet.MobileNet>();
   const [detections, setDetections] = useState<string[]>([]);
-  const [cameraType, setCameraType] = useState<CameraType>(CameraType.back);
   const [orientation, setOrientation] = useState<ScreenOrientation.Orientation>();
 
   useEffect(() => {
     async function prepare() {
+      setNet(await mobilenet.load({ version: 1, alpha: 0.25 }));
+
       // Set initial orientation.
       const curOrientation = await ScreenOrientation.getOrientationAsync();
       console.log(curOrientation);
@@ -39,23 +37,6 @@ const Detection: FC<DetectionProps> = (props) => {
   }, []);
 
   const isPortrait = useMemo(() => checkIsPortrait(orientation), [orientation]);
-
-  const handleSwitchCameraType = useCallback(() => {
-    if (cameraType === CameraType.front) {
-      setCameraType(CameraType.back);
-    } else {
-      setCameraType(CameraType.front);
-    }
-  }, [cameraType, setCameraType]);
-
-  const renderCameraTypeSwitcher = useCallback(
-    () => (
-      <View style={styles.cameraTypeSwitcher} onTouchEnd={handleSwitchCameraType}>
-        <Text>Switch to {cameraType === CameraType.front ? 'back' : 'front'} camera</Text>
-      </View>
-    ),
-    [cameraType, handleSwitchCameraType]
-  );
 
   const handleCameraStream = useCallback(
     (images: IterableIterator<tf.Tensor3D>) => {
@@ -87,13 +68,7 @@ const Detection: FC<DetectionProps> = (props) => {
 
   return (
     <View style={isPortrait ? styles.containerPortrait : styles.containerLandscape}>
-      <TensorCamera
-        type={cameraType}
-        style={styles.camera}
-        isPortrait={isPortrait}
-        onReady={handleCameraStream}
-      />
-      {renderCameraTypeSwitcher()}
+      <TensorCamera style={styles.camera} isPortrait={isPortrait} onReady={handleCameraStream} />
       <View style={styles.text}>
         {detections.map((detection, index) => (
           <Text key={index}>{detection}</Text>
@@ -142,4 +117,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Detection;
+export default DetectionMobilenet;
