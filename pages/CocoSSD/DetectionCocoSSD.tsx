@@ -1,24 +1,28 @@
-import {
-  StyleSheet,
-  View,
-  Platform,
-  useWindowDimensions,
-  Text,
-  ActivityIndicator,
-} from 'react-native';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import React, { useState, FC, useCallback, useEffect, useMemo, useRef } from 'react';
+import { StyleSheet, View, Platform, Text } from 'react-native';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 
+// Tensorflow js
 import * as tf from '@tensorflow/tfjs';
 import * as cocoSSD from '@tensorflow-models/coco-ssd';
+import { useIsFocused } from '@react-navigation/native';
 
-import Canvas, { CanvasRenderingContext2D } from 'react-native-canvas';
+// Components
+import Canvas from 'react-native-canvas';
+import TensorCamera from '../../components/TensorCamera';
+import ActivityIndicator from '../../components/ActivityIndicator';
 
+// Utils
 import { LAYOUT } from '../../constants/Layout';
 import { checkIsPortrait } from '../../helpers/Camera';
-import TensorCamera from '../../components/TensorCamera';
+
+// Constants
+import { DETECTION_COLORS } from '../../constants/Colors';
 import { COMPUTE_RECOGNITION_EVERY_N_FRAMES } from '../../constants/Tensorflow';
-import { useIsFocused } from '@react-navigation/native';
+
+// Types
+import type { FC } from 'react';
+import type { CanvasRenderingContext2D } from 'react-native-canvas';
 
 let frame = 0;
 
@@ -28,12 +32,10 @@ const DetectionCocoSSD: FC<{}> = (props) => {
   const canvas = useRef<Canvas>();
   const context = useRef<CanvasRenderingContext2D>();
 
+  const isFocused = useIsFocused();
   const [model, setModel] = useState<cocoSSD.ObjectDetection>();
   const [detections, setDetections] = useState<cocoSSD.DetectedObject[]>([]);
-
   const [orientation, setOrientation] = useState<ScreenOrientation.Orientation>();
-
-  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused && !model) {
@@ -79,7 +81,7 @@ const DetectionCocoSSD: FC<{}> = (props) => {
       context.current.clearRect(0, 0, width, height + 60);
 
       // draw rectangle for each prediction
-      for (const prediction of predictions) {
+      for (const [index, prediction] of predictions.entries()) {
         const [x, y, width, height] = prediction.bbox;
 
         // scale the coordinates based on the ratio calculated
@@ -88,9 +90,9 @@ const DetectionCocoSSD: FC<{}> = (props) => {
           : x * scaleWidth;
         const boundingBoxY = y * scaleHeight;
 
-        context.current.strokeStyle = 'red';
-        context.current.fillStyle = 'red';
-        context.current.lineWidth = 3;
+        context.current.strokeStyle = DETECTION_COLORS[index % 5];
+        context.current.fillStyle = DETECTION_COLORS[index % 5];
+        context.current.lineWidth = 1;
 
         context.current.strokeRect(
           boundingBoxX,
@@ -153,11 +155,7 @@ const DetectionCocoSSD: FC<{}> = (props) => {
   );
 
   if (!model) {
-    return (
-      <View style={[styles.spinnerContainer]}>
-        <ActivityIndicator />
-      </View>
-    );
+    return <ActivityIndicator />;
   }
 
   return (
@@ -179,23 +177,19 @@ const styles = StyleSheet.create({
   text: {
     flex: 1,
   },
-  camera: {
-    flex: 20,
-    width: '100%',
-    height,
-  },
-  canvas: {
-    position: 'absolute',
-    zIndex: 10000000000,
-    width: '100%',
-    height: '100%',
-  },
   container: {
     flex: 1,
   },
-  spinnerContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  camera: {
+    height,
+    flex: 20,
+    width: '100%',
+  },
+  canvas: {
+    width: '100%',
+    height: '100%',
+    zIndex: 10000000000,
+    position: 'absolute',
   },
 });
 

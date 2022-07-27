@@ -1,13 +1,21 @@
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { StyleSheet, Text, View, Dimensions, ActivityIndicator } from 'react-native';
-import React, { useState, FC, useCallback, useEffect, useMemo } from 'react';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
+// Tensorflow js
 import * as tf from '@tensorflow/tfjs';
 import * as mobilenet from '@tensorflow-models/mobilenet';
 
+// Components
 import TensorCamera from '../../components/TensorCamera';
+import ActivityIndicator from '../../components/ActivityIndicator';
+
+// Utils
 import { COMPUTE_RECOGNITION_EVERY_N_FRAMES } from '../../constants/Tensorflow';
 import { CAM_PREVIEW_HEIGHT, CAM_PREVIEW_WIDTH, checkIsPortrait } from '../../helpers/Camera';
+
+// Types
+import type { FC } from 'react';
 
 let frame = 0;
 
@@ -46,7 +54,6 @@ const DetectionMobilenet: FC<DetectionProps> = (props) => {
             if (nextImageTensor) {
               const objects = await net.classify(nextImageTensor);
               if (objects && objects.length > 0) {
-                console.log(objects);
                 setDetections(
                   objects.map((object) => `${object.className}: ${object.probability}\n`)
                 );
@@ -66,11 +73,7 @@ const DetectionMobilenet: FC<DetectionProps> = (props) => {
   );
 
   if (!net) {
-    return (
-      <View style={[styles.container]}>
-        <ActivityIndicator />
-      </View>
-    );
+    return <ActivityIndicator />;
   }
 
   return (
@@ -104,10 +107,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, .7)',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
   },
   containerPortrait: {
     marginTop: 35,

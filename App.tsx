@@ -1,16 +1,23 @@
-import * as tf from '@tensorflow/tfjs';
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { View } from 'react-native';
+// Components
 import { Camera } from 'expo-camera';
+import { Text, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+// Tensorflow js
+import * as tf from '@tensorflow/tfjs';
+
+// Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 // Pages
 import DetectionCocoSSD from './pages/CocoSSD/DetectionCocoSSD';
 import DetectionMobilenet from './pages/Mobilenet/DetectionMobilenet';
+
+// Types
+import type { FC } from 'react';
 
 // Inicializo Tensorflow
 const initialiseTensorflow = async () => {
@@ -46,9 +53,9 @@ const App: FC<{}> = () => {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
             if (route.name === 'CocoSSD') {
-              iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline';
+              iconName = focused ? 'images' : 'images-outline';
             } else if (route.name === 'Mobilenet') {
-              iconName = focused ? 'ios-list-box' : 'ios-list';
+              iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline';
             }
             return <Ionicons name={iconName as any} size={size} color={color} />;
           },
