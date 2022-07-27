@@ -1,7 +1,16 @@
-import React, { FC, useEffect } from 'react';
 import * as tf from '@tensorflow/tfjs';
+import React, { FC, useEffect, useState } from 'react';
 
-import Home from './pages/home';
+import { View } from 'react-native';
+import { Camera } from 'expo-camera';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+// Pages
+import DetectionCocoSSD from './pages/CocoSSD/DetectionCocoSSD';
+import DetectionMobilenet from './pages/Mobilenet/DetectionMobilenet';
 
 // Inicializo Tensorflow
 const initialiseTensorflow = async () => {
@@ -9,14 +18,48 @@ const initialiseTensorflow = async () => {
   tf.getBackend();
 };
 
+const Stack = createBottomTabNavigator();
+
 const App: FC<{}> = () => {
+  const [hasPermission, setHasPermission] = useState<null | boolean>(null);
+
   useEffect(() => {
     (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === 'granted');
       await initialiseTensorflow();
     })();
   }, []);
 
-  return <Home />;
+  if (hasPermission === null) {
+    return <View />;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={({ route }) => ({
+          unmountOnBlur: true,
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+            if (route.name === 'CocoSSD') {
+              iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline';
+            } else if (route.name === 'Mobilenet') {
+              iconName = focused ? 'ios-list-box' : 'ios-list';
+            }
+            return <Ionicons name={iconName as any} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: 'tomato',
+          tabBarInactiveTintColor: 'gray',
+        })}>
+        <Stack.Screen name='CocoSSD' component={DetectionCocoSSD} />
+        <Stack.Screen name='Mobilenet' component={DetectionMobilenet} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 };
 
 export default App;

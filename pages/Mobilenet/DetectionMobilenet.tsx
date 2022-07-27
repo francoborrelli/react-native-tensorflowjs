@@ -1,13 +1,13 @@
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ActivityIndicator } from 'react-native';
 import React, { useState, FC, useCallback, useEffect, useMemo } from 'react';
 
 import * as tf from '@tensorflow/tfjs';
 import * as mobilenet from '@tensorflow-models/mobilenet';
 
-import TensorCamera from '../../../components/TensorCamera';
-import { COMPUTE_RECOGNITION_EVERY_N_FRAMES } from '../../../constants/Tensorflow';
-import { CAM_PREVIEW_HEIGHT, CAM_PREVIEW_WIDTH, checkIsPortrait } from '../../../helpers/Camera';
+import TensorCamera from '../../components/TensorCamera';
+import { COMPUTE_RECOGNITION_EVERY_N_FRAMES } from '../../constants/Tensorflow';
+import { CAM_PREVIEW_HEIGHT, CAM_PREVIEW_WIDTH, checkIsPortrait } from '../../helpers/Camera';
 
 let frame = 0;
 
@@ -24,7 +24,6 @@ const DetectionMobilenet: FC<DetectionProps> = (props) => {
 
       // Set initial orientation.
       const curOrientation = await ScreenOrientation.getOrientationAsync();
-      console.log(curOrientation);
       setOrientation(curOrientation);
 
       // Listens to orientation change.
@@ -66,6 +65,14 @@ const DetectionMobilenet: FC<DetectionProps> = (props) => {
     [net]
   );
 
+  if (!net) {
+    return (
+      <View style={[styles.container]}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
   return (
     <View style={isPortrait ? styles.containerPortrait : styles.containerLandscape}>
       <TensorCamera style={styles.camera} isPortrait={isPortrait} onReady={handleCameraStream} />
@@ -87,11 +94,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   cameraTypeSwitcher: {
     top: 10,
     right: 10,
@@ -102,6 +104,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, .7)',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
   },
   containerPortrait: {
     marginTop: 35,
