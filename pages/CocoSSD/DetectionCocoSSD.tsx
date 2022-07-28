@@ -165,7 +165,7 @@ const DetectionCocoSSD: FC<{}> = (props) => {
       <View style={styles.text}>
         {detections.map((detection, index) => (
           <Text key={index}>
-            {detection.class}: {(detection.score * 100).toFixed(2)}%
+            {detection.class}: {(detection.score * 100).toFixed(5)}%
           </Text>
         ))}
       </View>

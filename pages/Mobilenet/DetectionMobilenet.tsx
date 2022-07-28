@@ -36,7 +36,6 @@ const DetectionMobilenet: FC<DetectionProps> = (props) => {
 
       // Listens to orientation change.
       ScreenOrientation.addOrientationChangeListener((event) => {
-        console.log(event.orientationInfo.orientation);
         setOrientation(event.orientationInfo.orientation);
       });
     }
@@ -55,7 +54,9 @@ const DetectionMobilenet: FC<DetectionProps> = (props) => {
               const objects = await net.classify(nextImageTensor);
               if (objects && objects.length > 0) {
                 setDetections(
-                  objects.map((object) => `${object.className}: ${object.probability}\n`)
+                  objects.map(
+                    (object) => `${object.className}: ${(object.probability * 100).toFixed(5)}%\n`
+                  )
                 );
               }
               tf.dispose([nextImageTensor]);
