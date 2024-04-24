@@ -4039,10 +4039,10 @@ expo-asset@~9.0.2:
     invariant "^2.2.4"
     md5-file "^3.2.3"
 
-expo-camera@~14.1.2:
-  version "14.1.2"
-  resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-14.1.2.tgz#51124414e65bfb36a9110412166ce5edcdc556be"
-  integrity sha512-J+679RJLvalufC5OCl+rbyGDWYrutFkYyFX5nkURBq+iIAQJoNH/LbaAPj9lRjerdoe9uw0Ma1ZrdVEfH20Q7Q==
+expo-camera@~14.1.3:
+  version "14.1.3"
+  resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-14.1.3.tgz#c3b36c7ed28613e7423b6c4df192549f4f9ee0dd"
+  integrity sha512-JodpVjOY8JDuSp/RkphS8Bxqaj/gwg0h0UbQB9MLr1LoxbL9brvJt7IZnmTf7+ON8jRKUx9E5o/F02pRNbmSbQ==
   dependencies:
     invariant "^2.2.4"
 
