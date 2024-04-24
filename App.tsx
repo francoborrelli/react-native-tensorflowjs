@@ -55,13 +55,14 @@ const App: FC<{}> = () => {
             if (route.name === 'CocoSSD') {
               iconName = focused ? 'images' : 'images-outline';
             } else if (route.name === 'Mobilenet') {
-              iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline';
+              iconName = focused ? 'image' : 'image-outline';
             }
             return <Ionicons name={iconName as any} size={size} color={color} />;
           },
           tabBarActiveTintColor: 'tomato',
           tabBarInactiveTintColor: 'gray',
-        })}>
+        })}
+      >
         <Stack.Screen name='CocoSSD' component={DetectionCocoSSD} />
         <Stack.Screen name='Mobilenet' component={DetectionMobilenet} />
       </Stack.Navigator>

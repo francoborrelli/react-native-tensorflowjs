@@ -1,5 +1,6 @@
 {
   "expo": {
+    "jsEngine": "jsc",
     "name": "Object Detection",
     "slug": "objects_detection",
     "version": "1.0.0",
